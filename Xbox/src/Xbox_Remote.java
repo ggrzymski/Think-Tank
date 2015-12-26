@@ -12,7 +12,7 @@ public class Xbox_Remote
 	
 	protected String xbox_ping = "dd00000a000000000000000400000002";
 	
-	protected String xbox_power  = "dd02001300000010";
+	protected static String xbox_power  = "dd02001300000010";
 	
 	protected static String home_ip="";
 	
@@ -66,7 +66,6 @@ public class Xbox_Remote
 			{
 				home_ip = br.readLine();
 				
-				br.close();
 			}
 			
 			catch(IOException i)
@@ -84,7 +83,6 @@ public class Xbox_Remote
 
 				home_ip = in.readLine();
 				
-				br.close();
 				in.close();
 			}
 			catch(Exception e)
@@ -98,10 +96,10 @@ public class Xbox_Remote
 	{
 		System.out.println("Enter your Xbox One Live ID from the console dashboard:");
 		
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		
 		try
 		{
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			
 			live_id = br.readLine();
 			
 			br.close();
@@ -118,13 +116,17 @@ public class Xbox_Remote
 		{
 			InetAddress address = InetAddress.getByName(ip);
 			
-			Socket sc = new Socket(address,port);
-		
+			Socket sc = new Socket(ip, port);
+			
+			// convert xbox's hex code into bytes for proper transmission
+			
+			byte [] xbox_power_bytes = hexTobytes(xbox_power);
+			
 			sc.close();
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
-			
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -148,6 +150,20 @@ public class Xbox_Remote
 		frame.pack();
 
 		frame.setVisible(true);
+	}
+	
+	private static byte[] hexTobytes(String s) 
+	{
+	    int len = s.length();
+	    
+	    byte[] data = new byte[len / 2];
+	    
+	    for (int i = 0; i < len; i += 2) 
+	    {
+	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)+ Character.digit(s.charAt(i+1), 16));
+	    }
+	    
+	    return data;
 	}
 
 }
