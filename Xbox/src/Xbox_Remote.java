@@ -114,15 +114,28 @@ public class Xbox_Remote
 	{
 		try
 		{
-			InetAddress address = InetAddress.getByName(ip);
-			
-			Socket sc = new Socket(ip, port);
-			
 			// convert xbox's hex code into bytes for proper transmission
 			
 			byte [] xbox_power_bytes = hexTobytes(xbox_power);
+			byte [] live_id_bytes = hexTobytes(live_id);
+			byte [] zero_pad = hexTobytes("00");
+			InetAddress address = InetAddress.getByName(ip);
 			
-			sc.close();
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+			outputStream.write(xbox_power_bytes);
+			outputStream.write(live_id_bytes);
+			outputStream.write(zero_pad);
+			
+			String test = xbox_power+live_id+"00";
+			byte [] result = test.getBytes();
+			
+			for(int i=0; i<5; i++)
+			{
+				DatagramPacket packet = new DatagramPacket(result, result.length, address, port);
+				DatagramSocket socket = new DatagramSocket();
+				socket.send(packet);
+				socket.close();
+			}
 		}
 		catch(Exception e)
 		{
